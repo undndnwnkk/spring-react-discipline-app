@@ -1,0 +1,30 @@
+server:
+  port: 8081
+
+
+spring:
+  application:
+    name: userservice
+
+  cloud:
+    vault:
+      uri: ${VAULT_URI}
+      token: ${VAULT_TOKEN}
+      kv:
+        enabled: true
+        backend: secret
+        default-context: userservice
+
+  config:
+    import: "vault://"
+
+  jpa:
+    database: postgresql
+    hibernate:
+      ddl-auto: update
+  grpc:
+    server:
+      port: 9091
+      reflection:
+        enabled: true
+      address: 0.0.0.0
