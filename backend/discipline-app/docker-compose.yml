@@ -1,0 +1,42 @@
+services:
+  userservice-db:
+    image: postgres:17-alpine
+    container_name: userservice-db
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./secrets/.env.userservice
+    environment:
+      POSTGRES_DB: ${USERSERVICE_DB_NAME}
+      POSTGRES_USER: ${USERSERVICE_DB_USER}
+      POSTGRES_PASSWORD: ${USERSERVICE_DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - discipline-app
+
+  userservice:
+    container_name: userservice
+    build:
+      context: .
+      dockerfile: userservice/Dockerfile
+    ports:
+      - "8081:8081"
+    env_file:
+      - ./secrets/.env.userservice
+    environment:
+      USERSERVICE_DB_URL: ${USERSERVICE_DB_URL}
+      USERSERVICE_DB_USER: ${USERSERVICE_DB_USER}
+      USERSERVICE_DB_PASSWORD: ${USERSERVICE_DB_PASSWORD}
+    depends_on:
+      - userservice-db
+    networks:
+      - discipline-app
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  discipline-app:
+    driver: bridge

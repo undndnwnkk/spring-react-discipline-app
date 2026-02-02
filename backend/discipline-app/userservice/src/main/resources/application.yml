@@ -6,22 +6,17 @@ spring:
   application:
     name: userservice
 
-  cloud:
-    vault:
-      uri: ${VAULT_URI}
-      token: ${VAULT_TOKEN}
-      kv:
-        enabled: true
-        backend: secret
-        default-context: userservice
-
-  config:
-    import: "vault://"
-
   jpa:
     database: postgresql
     hibernate:
       ddl-auto: update
+
+  datasource:
+    url: ${USERSERVICE_DB_URL}
+    username: ${USERSERVICE_DB_USER}
+    password: ${USERSERVICE_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
   grpc:
     server:
       port: 9091
