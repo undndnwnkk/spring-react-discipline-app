@@ -7,16 +7,15 @@ COPY authservice/pom.xml authservice/
 
 RUN mvn -pl userservice -am dependency:go-offline
 
-COPY userservice/src userservice/src
+COPY authservice/src authservice/src
 
-RUN mvn -pl userservice clean package -DskipTests
+RUN mvn -pl authservice clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-COPY --from=build /app/userservice/target/userservice-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/authservice/target/authservice-0.0.1-SNAPSHOT.jar app.jar
 
-EXPOSE 8081
-EXPOSE 9091
+EXPOSE 8082
 
 ENTRYPOINT ["java", "-Xmx512m", "-jar", "app.jar"]

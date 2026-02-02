@@ -1,4 +1,44 @@
 services:
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:latest
+    ports:
+      - "9090:8080"
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: authservice-db
+      DB_DATABASE: ${KEYCLOAK_DB_NAME}
+      DB_SCHEMA: ${KEYCLOAK_DB_SCHEMA}
+      DB_USER: ${KEYCLOAK_DB_USER}
+      DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      KC_PROXY: edge
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_LOGIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    depends_on:
+      - authservice-db
+    command:
+      - "start-dev"
+    networks:
+      - discipline-app
+
+  authservice-db:
+    image: postgres:17-alpine
+    container_name: authservice-db
+    ports:
+      - "5433:5432"
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${AUTHSERVICE_DB_NAME}
+      POSTGRES_USER: ${AUTHSERVICE_DB_USER}
+      POSTGRES_PASSWORD: ${AUTHSERVICE_DB_PASSWORD}
+    volumes:
+      - authservice_db_data:/var/lib/postgresql/data
+    networks:
+      - discipline-app
+
   userservice-db:
     image: postgres:17-alpine
     container_name: userservice-db
@@ -11,7 +51,7 @@ services:
       POSTGRES_USER: ${USERSERVICE_DB_USER}
       POSTGRES_PASSWORD: ${USERSERVICE_DB_PASSWORD}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - userservice_db_data:/var/lib/postgresql/data
     networks:
       - discipline-app
 
@@ -33,8 +73,29 @@ services:
     networks:
       - discipline-app
 
+#  authservice:
+#    container_name: authservice
+#    build:
+#      context: .
+#      dockerfile: authservice/Dockerfile
+#    ports:
+#      - "8082:8082"
+#    env_file:
+#      - .env
+#      - ./secrets/.env.authservice
+#    environment:
+#      AUTHSERVICE_DB_URL: ${AUTHSERVICE_DB_URL}
+#      AUTHSERVICE_DB_USER: ${AUTHSERVICE_DB_USER}
+#      AUTHSERVICE_DB_PASSWORD: ${AUTHSERVICE_DB_PASSWORD}
+#    depends_on:
+#      - authservice-db
+#    networks:
+#      - discipline-app
+
 volumes:
-  postgres_data:
+  userservice_db_data:
+    driver: local
+  authservice_db_data:
     driver: local
 
 networks:

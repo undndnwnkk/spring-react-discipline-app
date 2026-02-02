@@ -1,0 +1,22 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: authservice
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9090/realms/OauthTests
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:9090/realms/OauthTests
+            user-name-attribute: preffered_username
+        registration:
+          keycloak:
+            client-id: first-client
+            client-secret: ${KEYCLOAK_CLIENT_SECRET}
+            scope: openid

@@ -35,3 +35,4 @@ build/
 ### secrets ###
 .env
 secrets/.env.userservice
+secrets/.env.authservice
